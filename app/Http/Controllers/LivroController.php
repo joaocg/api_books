@@ -55,7 +55,6 @@ class LivroController extends Controller
     {
         $dados = json_decode($request->getContent(), true);
 
-
         try {
             $validator = Validator::make($dados, [
                 'titulo' => 'required|string|max:255',
@@ -147,7 +146,6 @@ class LivroController extends Controller
                 'titulo' => $index['titulo'],
                 'pagina' => $index['pagina'],
             ]);
-
 
             if (!empty($index['subindices'])) {
                 $this->salvarImportacaoXml($index['subindices'], $livro_id, $indice->id);
