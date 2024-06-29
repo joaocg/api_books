@@ -14,7 +14,8 @@ class Indice extends Model
     protected $fillable = [
         'titulo',
         'livro_id',
-        'pagina'
+        'pagina',
+        'indice_pai_id'
     ];
 
     protected $hidden = [

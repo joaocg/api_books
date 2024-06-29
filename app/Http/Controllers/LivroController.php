@@ -8,6 +8,8 @@ use App\Models\Livro;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use XMLReader;
+
 class LivroController extends Controller
 {
     /**
@@ -94,34 +96,92 @@ class LivroController extends Controller
         }
     }
 
-    public function show($id)
+    /**
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function importarIndices(Request $request, int $id): JsonResponse
     {
-        $livro = Livro::find($id);
-        if (!$livro) {
-            return response()->json(['message' => 'Livro não encontrado'], 404);
+        $xml = $request->file('xml');
+
+        try {
+            $request->validate([
+                'xml' => 'required|file',
+            ]);
+
+            $reader = new XMLReader;
+            $reader->open($xml);
+
+            while ($reader->read() !== FALSE) {
+                $this->formatarXml($reader, $indices);
+            }
+
+            $reader->close();
+
+            $this->salvarImportacaoXml($indices, $id);
+
+            return response()->json(['message' => 'Livros importados com sucesso'], 201);
+        } catch (ValidationException $e) {
+            return response()->json($e->errors(), 400);
         }
-        return response()->json($livro);
     }
 
-    public function update(Request $request, $id)
+    /**
+     * @param array|null $indices
+     * @param int $livro_id
+     * @param int|null $parent_id
+     * @return void
+     */
+    private function salvarImportacaoXml(array $indices = null, int $livro_id, int $parent_id = null): void
     {
-        $livro = Livro::find($id);
-        if (!$livro) {
-            return response()->json(['message' => 'Livro não encontrado'], 404);
+        foreach ($indices as $index) {
+            $indice = Indice::create([
+                'livro_id' => $livro_id,
+                'indice_pai_id' => $parent_id,
+                'titulo' => $index['titulo'],
+                'pagina' => $index['pagina'],
+            ]);
+
+
+            if (!empty($index['subindices'])) {
+                $this->salvarImportacaoXml($index['subindices'], $livro_id, $indice->id);
+            }
         }
-        $livro->update($request->all());
-        return response()->json($livro);
+
     }
 
-    public function destroy($id)
+    /**
+     * @param XMLReader $reader
+     * @param array|null $indices
+     * @param int|null $parentIndex
+     * @return void
+     */
+    private function formatarXml(XMLReader $reader, array &$indices = null, int $parentIndex = null): void
     {
-        $livro = Livro::find($id);
-        if (!$livro) {
-            return response()->json(['message' => 'Livro não encontrado'], 404);
-        }
-        $livro->delete();
-        return response()->json(['message' => 'Livro deletado com sucesso']);
-    }
+        while ($reader->read()) {
+            if ($reader->nodeType == XMLReader::ELEMENT && $reader->name == 'item') {
+                $pagina = $reader->getAttribute('pagina');
+                $titulo = $reader->getAttribute('titulo');
+                $index = [
+                    'pagina' => $pagina,
+                    'titulo' => $titulo,
+                    'subindices' => []
+                ];
 
+                if ($parentIndex !== null) {
+                    $indices[$parentIndex]['subindices'][] = $index;
+                    $currentIndex = count($indices[$parentIndex]['subindices']) - 1;
+                    $this->formatarXml($reader, $indices[$parentIndex]['subindices'], $currentIndex);
+                } else {
+                    $indices[] = $index;
+                    $currentIndex = count($indices) - 1;
+                    $this->formatarXml($reader, $indices, $currentIndex);
+                }
+            } elseif ($reader->nodeType == XMLReader::END_ELEMENT && $reader->name == 'item') {
+                return;
+            }
+        }
+    }
 
 }

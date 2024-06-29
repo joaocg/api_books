@@ -15,5 +15,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::get('livros', [LivroController::class, 'listarTodos']);
         Route::post('livros', [LivroController::class, 'create']);
+        Route::post('livros/{id}/importar-indices-xml', [LivroController::class, 'importarIndices']);
     });
 });
