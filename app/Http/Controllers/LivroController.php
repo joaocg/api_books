@@ -26,16 +26,21 @@ class LivroController extends Controller
         ]);
 
         $tituloIndice = $request->get('titulo_do_indice');
-        $livros = Livro::with(['usuario_publicador', 'indices' => function ($query) use ($tituloIndice) {
-            $query->whereNull('indice_pai_id')
-                ->where('titulo', 'like', "%{$tituloIndice}%")
-                ->with(['subindices' => function ($query) use ($tituloIndice) {
-                    $query->whereNotNull('indice_pai_id')
-                        ->orWhere('titulo', 'like', "%{$tituloIndice}%")
-                        ->with(['subindices']);
-                }]);
-        }])->get();
 
+        $livros = null;
+        if(!empty($tituloIndice)){
+            $livros = Livro::with(['usuario_publicador', 'indices' => function ($query) use ($tituloIndice) {
+                $query->whereNull('indice_pai_id')
+                    ->where('titulo', 'like', "%{$tituloIndice}%")
+                    ->with(['subindices' => function ($query) use ($tituloIndice) {
+                        $query->whereNotNull('indice_pai_id')
+                            ->orWhere('titulo', 'like', "%{$tituloIndice}%")
+                            ->with(['subindices']);
+                    }]);
+            }])->get();
+        } else{
+            $livros = Livro::with(['usuario_publicador', 'indices', 'indices.subindices'])->get();
+        }
 
         return response()->json([
             'data' => $livros
