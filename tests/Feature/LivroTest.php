@@ -12,6 +12,7 @@ class LivroTest extends TestCase
 {
     use RefreshDatabase;
 
+
     /** @test */
     public function it_lists_all_books()
     {
