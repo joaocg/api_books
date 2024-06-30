@@ -17,7 +17,7 @@ class LivroTest extends TestCase
     {
         $user = User::factory()->create();
         Passport::actingAs($user);
-        $livros = Livro::factory()->count(5)->create(['usuario_publicador_id' => $user->id]);
+        Livro::factory()->count(5)->create(['usuario_publicador_id' => $user->id]);
 
         $response = $this->getJson('/api/v1/livros');
         $response->assertStatus(200);
