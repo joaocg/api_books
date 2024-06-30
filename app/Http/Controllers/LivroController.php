@@ -100,6 +100,7 @@ class LivroController extends Controller
         }
     }
 
+
     /**
      * @param Request $request
      * @param int $id
@@ -116,7 +117,7 @@ class LivroController extends Controller
 
             $reader = new XMLReader;
             $reader->open($xml);
-
+            $indices = array();
             while ($reader->read() !== FALSE) {
                 $this->formatarXml($reader, $indices);
             }
@@ -126,7 +127,9 @@ class LivroController extends Controller
             $this->salvarImportacaoXml($indices, $id);
 
             return response()->json(['message' => 'Livros importados com sucesso'], 201);
+
         } catch (ValidationException $e) {
+
             return response()->json($e->errors(), 400);
         }
     }

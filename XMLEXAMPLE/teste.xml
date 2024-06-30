@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <indice>
-    <item pagina="1" titulo="Seção 1">
-        <item pagina="1" titulo="Seção 1.1">
-            <item pagina="1" titulo="Seção 1.1.1"/>
-            <item pagina="1" titulo="Seção 1.1.2"/>
+    <item pagina="1" titulo="Seção 3">
+        <item pagina="1" titulo="Seção 3.1">
+            <item pagina="1" titulo="Seção 3.1.1"/>
+            <item pagina="1" titulo="Seção 3.1.2"/>
         </item>
-        <item pagina="2" titulo="Seção 1.2"/>
+        <item pagina="2" titulo="Seção 3.2"/>
     </item>
-    <item pagina="2" titulo="Seção 2"/>
-    <item pagina="2" titulo="Seção 3"/>
+    <item pagina="2" titulo="Seção 4"/>
+    <item pagina="2" titulo="Seção 5"/>
 </indice>
