@@ -3,9 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Livro;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Passport\Passport;
 use Tests\TestCase;
 
 class CreateLivroTest extends TestCase
@@ -15,8 +13,6 @@ class CreateLivroTest extends TestCase
     /** @test */
     public function it_creates_a_book_with_indices()
     {
-        $user = User::factory()->create();
-        Passport::actingAs($user);
 
         $livroData = [
             'titulo' => 'Meu Livro com PhpUnit',
@@ -50,7 +46,7 @@ class CreateLivroTest extends TestCase
 
         $this->assertDatabaseHas('livros', [
             'titulo' => 'Meu Livro com PhpUnit',
-            'usuario_publicador_id' => $user->id,
+            'usuario_publicador_id' => $this->user->id,
         ]);
 
         foreach ($livroData['indices'] as $indiceData) {

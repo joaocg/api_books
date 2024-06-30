@@ -3,22 +3,18 @@
 namespace Tests\Feature;
 
 use App\Models\Livro;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Passport\Passport;
 use Tests\TestCase;
 
 class LivroTest extends TestCase
 {
     use RefreshDatabase;
 
-
     /** @test */
     public function it_lists_all_books()
     {
-        $user = User::factory()->create();
-        Passport::actingAs($user);
-        Livro::factory()->count(5)->create(['usuario_publicador_id' => $user->id]);
+
+        Livro::factory()->count(5)->create(['usuario_publicador_id' => $this->user->id]);
 
         $response = $this->getJson('/api/v1/livros');
         $response->assertStatus(200);
@@ -51,9 +47,7 @@ class LivroTest extends TestCase
     public function it_lists_books_filtered_by_titulo_do_indice()
     {
 
-        $user = User::factory()->create();
-        Passport::actingAs($user);
-        $livros = Livro::factory()->count(3)->create(['usuario_publicador_id' => $user->id]);
+        $livros = Livro::factory()->count(3)->create(['usuario_publicador_id' => $this->user->id]);
 
         foreach ($livros as $livro) {
             $livro->indices()->create([
